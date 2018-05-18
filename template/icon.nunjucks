@@ -1,69 +1,81 @@
+/**
+ * Icons
+ *
+ * @author Dominique Rau [domi.github@gmail.com](mailto:domi.github@gmail.com)<br/>
+ * @version 0.0.1
+ */
 // {{comment}}
+// tslint:disable:max-line-length
+// tslint:disable:cyclomatic-complexity
 {% if tslintDisable %}
 /* tslint:disable */
 {% endif %}
-import * as React from 'react'
+import * as React from 'react';
 
 const iconList = [
     {%- for icon in icons %}
     '{{icon.name}}',
     {%- endfor %}
-]
+];
 
 export interface IconProps {
-    color?: string
-    className?: string
-    height?: number
-    kind?: string
-    onClick?: () => void
-    preview?: boolean
-    size?: number
-    style?: any
-    width?: number
-    wrapperStyle?: any
+    color?: string;
+    strokeColor?: string;
+    className?: string;
+    height?: number;
+    kind?: {%- for icon in icons %}{% if loop.last %} '{{icon.name}}'{% else %} '{{icon.name}}' |{% endif %}{%- endfor %};
+    onClick?(): void;
+    preview?: boolean;
+    size?: number;
+    style?: any;
+    width?: number;
+    wrapperStyle?: any;
 }
 export default class Icon extends React.Component<IconProps, {}> {
 
-    static defaultProps = {
+    public static defaultProps = {
         className: '',
         color: 'currentColor',
-        size: 32
+        size: 32,
+    };
+
+    public render() {
+        const { kind, preview } = this.props;
+
+        return preview ? this.renderPreview() : this.renderIcon(kind);
     }
 
-    render() {
-        const { kind, preview } = this.props
-        return preview ? this.renderPreview() : this.renderIcon(kind)
+    public renderPreview() {
+
+        return (<div>{ iconList.map(kind => this.renderPreviewKind(kind)) }</div>);
     }
 
-    renderPreview() {
-        return (<div>{ iconList.map(kind => this.renderPreviewKind(kind)) }</div>)
-    }
-
-    renderIcon(kind) {
-        const { wrapperStyle } = this.props
+    public renderIcon(kind: string) {
+        const { wrapperStyle } = this.props;
         if (wrapperStyle) {
-            return (<div style={wrapperStyle}>{ this.getIcon(kind) }</div>)
+            return (<div style={wrapperStyle}>{ this.getIcon(kind) }</div>);
         }
-        return this.getIcon(kind)
+
+        return this.getIcon(kind);
     }
 
-    renderPreviewKind(kind) {
+    public renderPreviewKind(kind: string) {
         return (
             <div key={kind}>
                 <h3>&lt;Icon kind="{kind}" /&gt;</h3>
                 { this.renderIcon(kind) }
             </div>
-        )
+        );
     }
 
-    getIcon(kind) {
-        const { color, height, onClick, size, style, width, className } = this.props
+    public getIcon(kind: string) {
+        const { color, strokeColor, height, onClick, size, style, width, className } = this.props;
 
         switch (kind) {
             {% for icon in icons -%}
-            case ('{{icon.name}}'): return ({{icon.svg | safe}})
+            case ('{{icon.name}}'): return ({{icon.svg | safe}});
             {% endfor -%}
-            default: return null
+            default: return null;
         }
     }
 }
